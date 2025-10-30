@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>SpendGraph Demo</title>
 <style>
-  /* Light theme */
   :root {
     --bg:#f7f6f2;        /* off-white */
     --card:#ffffff;      /* white cards */
@@ -16,7 +15,8 @@
     --bad:#c62828;       /* red */
     --track:#e9edf1;     /* bar track */
     --shadow: 0 10px 30px rgba(0,0,0,.08);
-    --subtle: #eef1f5;
+    --subtle:#eef1f5;
+    --accent:#0f62fe;
   }
 
   * { box-sizing: border-box; }
@@ -33,15 +33,21 @@
 
   .pill { display:inline-block; padding: 4px 10px; border-radius: 999px; background:var(--subtle); color:#3b4046; font-size: 12px; margin-left:8px; }
 
-  .controls {
-    display:flex; align-items:center; gap:12px; margin-top:8px;
-    background: var(--subtle); border-radius: 12px; padding:10px 12px;
+  /* Filter buttons */
+  .controls { display:flex; align-items:center; gap:10px; margin-top:10px; }
+  .segmented {
+    display:inline-flex; background:var(--subtle); border-radius:12px; padding:4px; gap:4px;
   }
-  .controls label { font-size: 13px; color: var(--muted); }
-  .controls input[type="range"] { width: 220px; }
+  .segmented button {
+    appearance:none; border:0; background:transparent; padding:8px 12px; border-radius:10px;
+    font-weight:600; color:#3b4046; cursor:pointer;
+  }
+  .segmented button.active {
+    background:#fff; color:#000; box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  }
 
   .bars { display:grid; grid-template-columns: 200px 1fr; gap: 10px 16px; align-items:center; }
-  .label { color:#1e2328; font-weight:600; }
+  .label { color:#1e2328; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
   .bar { height: 22px; background:var(--track); border-radius: 8px; position: relative; overflow:hidden; }
   .fill { height:100%; border-radius:8px; transition: width .35s ease; }
@@ -69,11 +75,12 @@
     <h1>Consider <em>eating in</em> this week… <span class="pill">June 2024</span></h1>
     <div class="subtitle">Salary: $100,000 • Saving goal: $30,000 in 36 months (≈ $833.33/mo)</div>
 
-    <!-- Interactivity: month progress scrubs how “spent” contributes to the bars -->
+    <!-- Interactivity: Week vs Month filter -->
     <div class="controls">
-      <label for="progress">Month progress:</label>
-      <input id="progress" type="range" min="0" max="100" value="45" />
-      <span id="progressLabel" class="pill">45%</span>
+      <div class="segmented" role="tablist" aria-label="Budget view">
+        <button id="btn-month" class="active" role="tab" aria-selected="true">By month</button>
+        <button id="btn-week" role="tab" aria-selected="false">By week</button>
+      </div>
     </div>
   </div>
 
@@ -83,7 +90,7 @@
 
   <div class="card events">
     <h2>You have <b>4</b> events scheduled today with an expected cost of <b>$180</b>.</h2>
-    <div class="subtitle">Based on envelopes, suggested cap is <b>$15.0</b> total.</div>
+    <div id="capline" class="subtitle">Based on envelopes, suggested cap is <b>$15.0</b> total.</div>
     <div id="events"></div>
   </div>
 </div>
@@ -99,30 +106,149 @@
 </div>
 
 <script>
+/* ---------- Data ---------- */
 const DATA = {"salary": 100000, "goal_total": 30000, "goal_months": 36, "monthly_required_savings": 833.33, "annual_required_savings": 10000.0, "savings_rate_assumed": 0.1, "month_label": "June 2024", "categories": [{"category": "Auto & Gas", "baseline": -59.05, "elasticity": 1.0, "cut": 6.7669999999999915, "envelope": 0.0, "spent": -17.4, "pct": 0, "remaining": 17.4}, {"category": "Home Improvements", "baseline": -2319.98, "elasticity": 1.0, "cut": 6.7669999999999915, "envelope": 0.0, "spent": 0.0, "pct": 0, "remaining": 0.0}, {"category": "Paycheck", "baseline": 3892.365, "elasticity": 1.0, "cut": 6.7669999999999915, "envelope": 3885.6, "spent": 0.0, "pct": 0, "remaining": 3885.6}, {"category": "Subscriptions", "baseline": -87.88, "elasticity": 0.6, "cut": 4.060199999999995, "envelope": 0.0, "spent": -27.49, "pct": 0, "remaining": 27.49}, {"category": "Transfer", "baseline": -270.5, "elasticity": 1.0, "cut": 6.7669999999999915, "envelope": 0.0, "spent": 0.0, "pct": 0, "remaining": 0.0}, {"category": "Travel", "baseline": -5.8, "elasticity": 1.0, "cut": 6.7669999999999915, "envelope": 0.0, "spent": 0.0, "pct": 0, "remaining": 0.0}, {"category": "Utilities", "baseline": -266.1, "elasticity": 0.4, "cut": 2.7067999999999968, "envelope": 0.0, "spent": 0.0, "pct": 0, "remaining": 0.0}, {"category": "nan", "baseline": -409.365, "elasticity": 1.0, "cut": 6.7669999999999915, "envelope": 0.0, "spent": -622.15, "pct": 0, "remaining": 622.15}], "events_today": [{"title": "Dinner with Jim", "category": "Restaurants/Bars", "expected": 65, "cap": 0.0}, {"title": "Goose Concert", "category": "Entertainment", "expected": 70, "cap": 0.0}, {"title": "Drinks with Julia", "category": "Restaurants/Bars", "expected": 30, "cap": 0.0}, {"title": "Yoga Class", "category": "Subscriptions", "expected": 15, "cap": 15}], "events_expected_sum": 180, "events_capped_sum": 15.0};
 
-const $bars = document.getElementById('bars');
-const $progress = document.getElementById('progress');
-const $progressLabel = document.getElementById('progressLabel');
+const WEEKS_PER_MONTH = 4.345;
 
-/* Color logic stays the same */
+/* ---------- Utils ---------- */
 function colorFor(pct) {
   if (pct < 70) return 'var(--ok)';
   if (pct < 100) return 'var(--warn)';
   return 'var(--bad)';
 }
-
 function fmt(x){ return '$' + (Math.round(x*100)/100).toLocaleString(); }
 
-/* Compute percent from spent/envelope and a “month progress” factor */
-function computePct(cat, factor) {
+/* Get the budget base for a category in the current view.
+   Prefer envelope; if absent/zero, fall back to |baseline|. */
+function budgetBase(cat) {
   const env = Math.abs(cat.envelope || 0);
-  const spent = Math.abs(cat.spent || 0) * (factor/100); // scale by slider
-  if (env <= 0) return 0;
-  r
+  if (env > 0) return env;
+  const base = Math.abs(cat.baseline || 0);
+  return base; // fallback
+}
 
-renderBars();
+/* Scale a monthly amount to the chosen view */
+function scaleForView(amount, view) {
+  if (view === 'week') return amount / WEEKS_PER_MONTH;
+  return amount; // month
+}
+
+/* ---------- Bars ---------- */
+const $bars = document.getElementById('bars');
+const rowRefs = [];
+
+function buildBars() {
+  DATA.categories.forEach(c => {
+    const label = document.createElement('div');
+    label.className = 'label';
+    label.textContent = c.category && c.category !== 'nan' ? c.category : 'Other';
+    $bars.appendChild(label);
+
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+
+    const fill = document.createElement('div');
+    fill.className = 'fill';
+    fill.style.width = '0%';
+
+    const pct = document.createElement('div');
+    pct.className = 'pct';
+    pct.textContent = '0%';
+
+    const hint = document.createElement('div');
+    hint.className = 'hint';
+
+    bar.appendChild(fill);
+    bar.appendChild(pct);
+    bar.appendChild(hint);
+    $bars.appendChild(bar);
+
+    // Click to pin/unpin hint
+    bar.addEventListener('click', () => bar.classList.toggle('over'));
+
+    rowRefs.push({ cat: c, bar, fill, pct, hint });
+  });
+}
+
+function updateBars(view) {
+  rowRefs.forEach(r => {
+    const baseMonthly = budgetBase(r.cat);
+    const baseView = scaleForView(baseMonthly, view);
+    const spentMonthly = Math.abs(r.cat.spent || 0);
+    const spentView = scaleForView(spentMonthly, view);
+
+    let pctVal = 0;
+    if (baseView > 0) pctVal = Math.min(140, Math.round((spentView / baseView) * 100)); // allow slight overdraw for visual
+    r.fill.style.width = Math.min(100, pctVal) + '%';
+    r.fill.style.background = colorFor(pctVal);
+    r.pct.textContent = Math.round(Math.min(100, pctVal)) + '%';
+
+    const envMonthly = Math.abs(r.cat.envelope || 0);
+    const envText = envMonthly > 0 ? `Envelope ${fmt(scaleForView(envMonthly, view))}` : `Baseline ${fmt(scaleForView(Math.abs(r.cat.baseline || 0), view))}`;
+    r.hint.textContent = `${Math.round(Math.min(100, pctVal))}% used — ${envText}, Spent ${fmt(spentView)}`;
+
+    if (pctVal >= 100) r.bar.classList.add('over'); else r.bar.classList.remove('over');
+  });
+}
+
+/* ---------- Events ---------- */
+function renderEvents() {
+  const list = document.getElementById('events');
+  DATA.events_today.forEach(e => {
+    const row = document.createElement('div');
+    row.className = 'row';
+
+    const title = document.createElement('div');
+    title.className = 'title';
+    title.textContent = e.title + ' ';
+    const cat = document.createElement('span');
+    cat.className = 'pill';
+    cat.textContent = e.category;
+    title.appendChild(cat);
+
+    const amt = document.createElement('div');
+    amt.className = 'amt';
+    amt.textContent = fmt(e.expected) + (e.cap < e.expected && e.cap > 0 ? `  → cap ${fmt(e.cap)}` : '');
+
+    row.appendChild(title);
+    row.appendChild(amt);
+    list.appendChild(row);
+  });
+}
+
+function updateCapLine(view) {
+  const capline = document.getElementById('capline');
+  const monthlyCap = Number(DATA.events_capped_sum || 0);
+  const cap = scaleForView(monthlyCap, view);
+  capline.innerHTML = `Based on envelopes, suggested cap is <b>${fmt(cap)}</b> total.`;
+}
+
+/* ---------- View controls ---------- */
+const $btnMonth = document.getElementById('btn-month');
+const $btnWeek  = document.getElementById('btn-week');
+
+function setView(view) {
+  // Buttons state
+  if (view === 'month') {
+    $btnMonth.classList.add('active'); $btnMonth.setAttribute('aria-selected','true');
+    $btnWeek.classList.remove('active'); $btnWeek.setAttribute('aria-selected','false');
+  } else {
+    $btnWeek.classList.add('active'); $btnWeek.setAttribute('aria-selected','true');
+    $btnMonth.classList.remove('active'); $btnMonth.setAttribute('aria-selected','false');
+  }
+  // Update UI
+  updateBars(view);
+  updateCapLine(view);
+}
+
+$btnMonth.addEventListener('click', () => setView('month'));
+$btnWeek .addEventListener('click', () => setView('week'));
+
+/* ---------- Init ---------- */
+buildBars();
 renderEvents();
+setView('month'); // default
 </script>
 </body>
 </html>
