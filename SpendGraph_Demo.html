@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SpendGraph Demo</title>
+<style>
+  :root { --bg:#0b0c10; --card:#111218; --ink:#e6e6e6; --muted:#9aa0a6; --ok:#2e7d32; --warn:#f9a825; --bad:#c62828; }
+  body { margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; background:var(--bg); color:var(--ink); }
+  .wrap { max-width: 840px; margin: 24px auto 120px; padding: 0 16px; }
+  .card { background: var(--card); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.25); margin-bottom: 16px; }
+  h1, h2, h3 { margin: 0 0 12px; }
+  .subtitle { color: var(--muted); }
+  .pill { display:inline-block; padding: 4px 10px; border-radius: 999px; background:#1a1b21; color:#cfd8dc; font-size: 12px; margin-left:8px; }
+  .bars { display:grid; grid-template-columns: 200px 1fr; gap: 10px 16px; align-items:center; }
+  .label { color:#d0d3d7; font-weight:600; }
+  .bar { height: 22px; background:#1a1b21; border-radius: 6px; position: relative; }
+  .fill { height:100%; border-radius:6px; }
+  .pct { position:absolute; right:6px; top:50%; transform: translateY(-50%); font-size:12px; color:#eceff1; }
+  .hint { position:absolute; right:-6px; top:-32px; background:#fff; color:#111; font-size:12px; padding:6px 8px; border-radius:6px; box-shadow: 0 8px 18px rgba(0,0,0,.45); display:none; white-space:nowrap; }
+  .bar.over .hint { display:block; }
+  .events .row { display:flex; justify-content:space-between; align-items:center; background:#14151c; padding:10px 12px; border-radius:10px; margin:8px 0; }
+  .events .title { font-weight:600; }
+  .events .amt { font-weight:700; }
+  .footer { position: fixed; left:0; right:0; bottom:0; background:#0f1016; border-top:1px solid #1c1d26; padding:10px 16px; }
+  .chips { display:flex; gap:14px; justify-content:center; }
+  .chip { width:54px; height:54px; border:2px solid #f28e1c; border-radius:16px; opacity:.9; }
+  .chip.circle { border-radius:999px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Consider <em>eating in</em> this week… <span class="pill">June 2024</span></h1>
+    <div class="subtitle">Salary: $100,000 • Saving goal: $30,000 in 36 months (≈ $833.33/mo)</div>
+  </div>
+
+  <div class="card">
+    <div class="bars" id="bars"></div>
+  </div>
+
+  <div class="card events">
+    <h2>You have <b>4</b> events scheduled today with an expected cost of <b>$180</b>.</h2>
+    <div class="subtitle">Based on envelopes, suggested cap is <b>$15.0</b> total.</div>
+    <div id="events"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="chips">
+    <div class="chip"></div>
+    <div class="chip"></div>
+    <div class="chip circle"></div>
+    <div class="chip"></div>
+    <div class="chip"></div>
+  </div>
+</div>
+
+<script>
+const DATA = {"salary": 100000, "goal_total": 30000, "goal_months": 36, "monthly_required_savings": 833.33, "annual_required_savings": 10000.0, "savings_rate_assumed": 0.1, "month_label": "June 2024", "categories": [{"category": "Auto & Gas", "baseline": -59.05, "elasticity": 1.0, "cut": 6.7669999999999915, "envelope": 0.0, "spent": -17.4, "pct": 0, "remaining": 17.4}, {"category": "Home Improvements", "baseline": -2319.98, "elasticity": 1.0, "cut": 6.7669999999999915, "envelope": 0.0, "spent": 0.0, "pct": 0, "remaining": 0.0}, {"category": "Paycheck", "baseline": 3892.365, "elasticity": 1.0, "cut": 6.7669999999999915, "envelope": 3885.6, "spent": 0.0, "pct": 0, "remaining": 3885.6}, {"category": "Subscriptions", "baseline": -87.88, "elasticity": 0.6, "cut": 4.060199999999995, "envelope": 0.0, "spent": -27.49, "pct": 0, "remaining": 27.49}, {"category": "Transfer", "baseline": -270.5, "elasticity": 1.0, "cut": 6.7669999999999915, "envelope": 0.0, "spent": 0.0, "pct": 0, "remaining": 0.0}, {"category": "Travel", "baseline": -5.8, "elasticity": 1.0, "cut": 6.7669999999999915, "envelope": 0.0, "spent": 0.0, "pct": 0, "remaining": 0.0}, {"category": "Utilities", "baseline": -266.1, "elasticity": 0.4, "cut": 2.7067999999999968, "envelope": 0.0, "spent": 0.0, "pct": 0, "remaining": 0.0}, {"category": "nan", "baseline": -409.365, "elasticity": 1.0, "cut": 6.7669999999999915, "envelope": 0.0, "spent": -622.15, "pct": 0, "remaining": 622.15}], "events_today": [{"title": "Dinner with Jim", "category": "Restaurants/Bars", "expected": 65, "cap": 0.0}, {"title": "Goose Concert", "category": "Entertainment", "expected": 70, "cap": 0.0}, {"title": "Drinks with Julia", "category": "Restaurants/Bars", "expected": 30, "cap": 0.0}, {"title": "Yoga Class", "category": "Subscriptions", "expected": 15, "cap": 15}], "events_expected_sum": 180, "events_capped_sum": 15.0};
+
+function colorFor(pct) { 
+  if (pct < 70) return 'var(--ok)';
+  if (pct < 100) return 'var(--warn)';
+  return 'var(--bad)';
+}
+
+function fmt(x){ return '$' + (Math.round(x*100)/100).toLocaleString(); }
+
+function renderBars() {
+  const root = document.getElementById('bars');
+  const cats = DATA.categories;
+  cats.forEach(c => {
+    const label = document.createElement('div');
+    label.className = 'label';
+    label.textContent = c.category;
+    root.appendChild(label);
+
+    const bar = document.createElement('div');
+    bar.className = 'bar' + (c.pct >= 100 ? ' over' : '');
+    const fill = document.createElement('div');
+    fill.className = 'fill';
+    fill.style.width = Math.min(140, c.pct) + '%';
+    fill.style.background = colorFor(c.pct);
+
+    const pct = document.createElement('div');
+    pct.className = 'pct';
+    pct.textContent = c.pct + '%';
+
+    const hint = document.createElement('div');
+    hint.className = 'hint';
+    if (c.pct >= 100) {
+      hint.textContent = `You're ${c.pct-100}% over budget on ${c.category} this month.`;
+    } else {
+      hint.textContent = `${c.pct}% of envelope used — Envelope ${fmt(c.envelope)}, Spent ${fmt(c.spent)}`;
+    }
+
+    bar.appendChild(fill);
+    bar.appendChild(pct);
+    bar.appendChild(hint);
+    root.appendChild(bar);
+  });
+}
+
+function renderEvents() {
+  const list = document.getElementById('events');
+  DATA.events_today.forEach(e => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    const title = document.createElement('div');
+    title.className = 'title';
+    title.textContent = e.title + ' ';
+    const cat = document.createElement('span');
+    cat.className = 'pill';
+    cat.textContent = e.category;
+    title.appendChild(cat);
+
+    const amt = document.createElement('div');
+    amt.className = 'amt';
+    amt.textContent = fmt(e.expected) + (e.cap < e.expected ? `  → cap ${fmt(e.cap)}` : '');
+
+    row.appendChild(title);
+    row.appendChild(amt);
+    list.appendChild(row);
+  });
+}
+
+renderBars();
+renderEvents();
+</script>
+</body>
+</html>
