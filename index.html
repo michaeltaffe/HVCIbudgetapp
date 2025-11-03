@@ -12,84 +12,110 @@
   --track:#e9edf1; --shadow:0 6px 22px rgba(0,0,0,.08);
   --subtle:#eef1f5; --accent:#0066cc;
 }
-*{box-sizing:border-box}
 body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--ink)}
 .wrap{max-width:480px;margin:16px auto 100px;padding:0 12px}
 .card{background:var(--card);border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px}
-h1,h2,h3{margin:0 0 10px}
+h1,h2{margin:0 0 10px}
 .subtitle{color:var(--muted);font-size:13px}
-.pill{display:inline-block;padding:3px 8px;border-radius:999px;background:var(--subtle);color:#3b4046;font-size:11px;margin-left:6px}
-
-/* Segmented controls */
-.controls{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;flex-wrap:wrap}
-.segmented{display:inline-flex;background:var(--subtle);border-radius:12px;padding:3px;gap:3px}
-.segmented button{
-  appearance:none;border:0;background:transparent;
-  padding:6px 10px;border-radius:10px;font-weight:600;color:#3b4046;cursor:pointer;
-  transition:background .25s;font-size:13px
-}
-.segmented button.active{background:#fff;color:#000;box-shadow:0 2px 6px rgba(0,0,0,.08)}
-.view-note{font-size:11px;color:var(--muted)}
-
-/* Bars */
-.bars{display:grid;grid-template-columns:1fr;gap:14px}
-.bar-wrap{display:flex;flex-direction:column;gap:4px}
-.label{color:#1e2328;font-weight:600;font-size:13px}
-.bar{height:20px;background:var(--track);border-radius:8px;position:relative;overflow:hidden;cursor:pointer}
-.fill{height:100%;border-radius:8px;transition:width .35s ease, background .35s ease}
-.pct{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:#111;text-shadow:0 1px 0 rgba(255,255,255,.9)}
-.pct.invert{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5)}
-.hint{
-  position:absolute;left:0;bottom:130%;
-  background:#111;color:#fff;font-size:11px;
-  padding:5px 8px;border-radius:6px;
-  box-shadow:0 6px 14px rgba(0,0,0,.2);
-  opacity:0;transform:translateY(6px);
-  transition:opacity .2s, transform .2s;
-  white-space:nowrap;pointer-events:none
-}
-.bar:hover .hint{opacity:1;transform:translateY(0)}
-
-/* Context panel */
-.context{background:var(--subtle);border-radius:12px;padding:12px 14px;font-size:13px;margin-bottom:12px}
-.context a{color:var(--accent);font-weight:600;cursor:pointer;text-decoration:none}
-.context-detail{display:none;font-size:12px;color:var(--muted);margin-top:5px;line-height:1.4}
-
-/* Event list */
-.events .row{display:flex;justify-content:space-between;align-items:center;background:var(--subtle);padding:8px 10px;border-radius:10px;margin:6px 0;font-size:13px}
-.events .title{font-weight:600}
-.events .amt{font-weight:700}
-
-/* Footer icons */
-.footer{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #e6e6ea;padding:12px 16px;box-shadow:0 -3px 15px rgba(0,0,0,.05)}
+.controls{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.segmented{display:flex;background:var(--subtle);border-radius:12px;padding:3px}
+.segmented button{border:0;background:none;padding:6px 10px;border-radius:8px;cursor:pointer;font-weight:600}
+.segmented button.active{background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.bars{display:grid;gap:12px}
+.bar{height:18px;background:var(--track);border-radius:8px;position:relative;overflow:hidden}
+.fill{height:100%;border-radius:8px;transition:width .4s ease}
+.pct{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:#111}
+.footer{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #ddd;padding:12px 16px;box-shadow:0 -3px 10px rgba(0,0,0,.05)}
 .chips{display:flex;gap:14px;justify-content:center}
-.chip{
-  width:52px;height:52px;border:2px solid #f28e1c;border-radius:14px;opacity:.95;
-  display:flex;align-items:center;justify-content:center;
-  transition:background .2s, transform .2s
-}
-.chip.active{background:#f28e1c;color:#fff;transform:scale(1.05)}
+.chip{width:52px;height:52px;border:2px solid #f28e1c;border-radius:14px;display:flex;align-items:center;justify-content:center}
 .chip i{font-size:22px;color:#f28e1c}
-.chip.active i{color:#fff}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <!-- Header -->
-  <div class="card" id="summary">
-    <h1>Time–Budget Dashboard <span class="pill">Demo</span></h1>
-    <div class="subtitle" id="summaryText">Loading summary...</div>
-
+  <div class="card">
+    <h1>Time–Budget Dashboard</h1>
     <div class="controls">
-      <div class="segmented" role="tablist" aria-label="Dashboard view">
-        <button id="btn-day" role="tab" aria-selected="false">Day</button>
-        <button id="btn-week" role="tab" aria-selected="false">Week</button>
-        <button id="btn-month" class="active" role="tab" aria-selected="true">Month</button>
+      <div class="segmented">
+        <button id="btn-day">Day</button>
+        <button id="btn-week">Week</button>
+        <button id="btn-month" class="active">Month</button>
       </div>
-      <div id="viewNote" class="view-note">(Month view)</div>
+      <div class="subtitle" id="viewNote">(Month view)</div>
     </div>
   </div>
 
-  <!-- Context Panel -->
-  <div class="context">
-    You’ve reached <b>85%</b> of your dining budget. <a id="whyLink
+  <div class="card">
+    <h2>Progress Overview</h2>
+    <div class="bars" id="bars"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="chips">
+    <div class="chip"><i class="lucide lucide-home"></i></div>
+    <div class="chip"><i class="lucide lucide-calendar-days"></i></div>
+    <div class="chip"><i class="lucide lucide-credit-card"></i></div>
+    <div class="chip"><i class="lucide lucide-bar-chart-3"></i></div>
+    <div class="chip"><i class="lucide lucide-settings"></i></div>
+  </div>
+</div>
+
+<script>
+const DATASETS = {
+  day: [
+    {category:"Dining", spent:10, budget:20},
+    {category:"Work", spent:4, budget:10},
+    {category:"Transport", spent:8, budget:8},
+    {category:"Leisure", spent:2, budget:15}
+  ],
+  week: [
+    {category:"Dining", spent:75, budget:100},
+    {category:"Work", spent:40, budget:60},
+    {category:"Transport", spent:25, budget:40},
+    {category:"Leisure", spent:20, budget:50}
+  ],
+  month: [
+    {category:"Dining", spent:250, budget:300},
+    {category:"Work", spent:180, budget:200},
+    {category:"Transport", spent:140, budget:160},
+    {category:"Leisure", spent:120, budget:200}
+  ]
+};
+
+function colorFor(p){if(p<70)return'var(--ok)';if(p<100)return'var(--warn)';return'var(--bad)';}
+
+function render(view){
+  document.querySelectorAll('.segmented button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('btn-'+view).classList.add('active');
+  document.getElementById('viewNote').textContent=`(${view[0].toUpperCase()+view.slice(1)} view)`;
+  
+  const bars=document.getElementById('bars');
+  bars.innerHTML='';
+  DATASETS[view].forEach(d=>{
+    const bar=document.createElement('div');
+    const pct=Math.round(d.spent/d.budget*100);
+    bar.className='bar';
+    const fill=document.createElement('div');
+    fill.className='fill';
+    fill.style.width=Math.min(100,pct)+'%';
+    fill.style.background=colorFor(pct);
+    const pctText=document.createElement('div');
+    pctText.className='pct';
+    pctText.textContent=pct+'%';
+    bar.appendChild(fill);
+    bar.appendChild(pctText);
+    const label=document.createElement('div');
+    label.textContent=`${d.category}: $${d.spent} of $${d.budget}`;
+    bars.appendChild(label);
+    bars.appendChild(bar);
+  });
+}
+
+document.getElementById('btn-day').onclick=()=>render('day');
+document.getElementById('btn-week').onclick=()=>render('week');
+document.getElementById('btn-month').onclick=()=>render('month');
+render('month');
+</script>
+</body>
+</html>
