@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -9,7 +9,7 @@
 :root {
   --bg:#f7f6f2; --card:#fff; --ink:#16181d;
   --muted:#5f6b76; --ok:#2e7d32; --warn:#f9a825; --bad:#c62828;
-  --track:#e9edf1; --shadow:0 10px 30px rgba(0,0,0,.08);
+  --track:#e9edf1; --shadow:0 6px 22px rgba(0,0,0,.08);
   --subtle:#eef1f5; --accent:#0066cc;
 }
 *{box-sizing:border-box}
@@ -18,43 +18,45 @@ body{
   font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
   background:var(--bg); color:var(--ink);
 }
-.wrap{max-width:900px;margin:24px auto 140px;padding:0 16px}
+.wrap{max-width:480px;margin:16px auto 100px;padding:0 12px}
 .card{
   background:var(--card);
   border-radius:16px;
-  padding:20px;
+  padding:16px;
   box-shadow:var(--shadow);
-  margin-bottom:16px;
+  margin-bottom:14px;
 }
-h1,h2,h3{margin:0 0 12px}
-.subtitle{color:var(--muted)}
-.pill{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--subtle);color:#3b4046;font-size:12px;margin-left:8px}
+h1,h2,h3{margin:0 0 10px}
+.subtitle{color:var(--muted);font-size:13px}
+.pill{display:inline-block;padding:3px 8px;border-radius:999px;background:var(--subtle);color:#3b4046;font-size:11px;margin-left:6px}
 
 /* Segmented controls */
-.controls{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
-.segmented{display:inline-flex;background:var(--subtle);border-radius:12px;padding:4px;gap:4px}
+.controls{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;flex-wrap:wrap}
+.segmented{display:inline-flex;background:var(--subtle);border-radius:12px;padding:3px;gap:3px}
 .segmented button{
   appearance:none;border:0;background:transparent;
-  padding:8px 12px;border-radius:10px;font-weight:600;color:#3b4046;cursor:pointer;
+  padding:6px 10px;border-radius:10px;font-weight:600;color:#3b4046;cursor:pointer;
   transition:background .25s;
+  font-size:13px;
 }
 .segmented button.active{
-  background:#fff;color:#000;box-shadow:0 2px 8px rgba(0,0,0,.08)
+  background:#fff;color:#000;box-shadow:0 2px 6px rgba(0,0,0,.08)
 }
-.view-note{font-size:12px;color:var(--muted)}
+.view-note{font-size:11px;color:var(--muted)}
 
 /* Bars */
-.bars{display:grid;grid-template-columns:180px 1fr;gap:10px 16px;align-items:center}
-.label{color:#1e2328;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bar{height:22px;background:var(--track);border-radius:8px;position:relative;overflow:hidden;cursor:pointer}
-.fill{height:100%;border-radius:8px;transition:width .45s ease, background .45s ease}
-.pct{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:700;color:#111;text-shadow:0 1px 0 rgba(255,255,255,.9)}
+.bars{display:grid;grid-template-columns:1fr;gap:14px}
+.bar-wrap{display:flex;flex-direction:column;gap:4px}
+.label{color:#1e2328;font-weight:600;font-size:13px}
+.bar{height:20px;background:var(--track);border-radius:8px;position:relative;overflow:hidden;cursor:pointer}
+.fill{height:100%;border-radius:8px;transition:width .4s ease, background .4s ease}
+.pct{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:#111;text-shadow:0 1px 0 rgba(255,255,255,.9)}
 .pct.invert{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5)}
 .hint{
   position:absolute;left:0;bottom:130%;
-  background:#111;color:#fff;font-size:12px;
-  padding:6px 8px;border-radius:6px;
-  box-shadow:0 8px 18px rgba(0,0,0,.25);
+  background:#111;color:#fff;font-size:11px;
+  padding:5px 8px;border-radius:6px;
+  box-shadow:0 6px 14px rgba(0,0,0,.2);
   opacity:0;transform:translateY(6px);
   transition:opacity .2s, transform .2s;
   white-space:nowrap;pointer-events:none;
@@ -65,40 +67,40 @@ h1,h2,h3{margin:0 0 12px}
 .context{
   background:var(--subtle);
   border-radius:12px;
-  padding:14px 16px;
-  font-size:14px;
+  padding:12px 14px;
+  font-size:13px;
   margin-bottom:12px;
 }
 .context a{color:var(--accent);font-weight:600;cursor:pointer;text-decoration:none}
-.context-detail{display:none;font-size:13px;color:var(--muted);margin-top:6px;line-height:1.4}
+.context-detail{display:none;font-size:12px;color:var(--muted);margin-top:5px;line-height:1.4}
 
 /* Event list */
-.events .row{display:flex;justify-content:space-between;align-items:center;background:var(--subtle);padding:10px 12px;border-radius:10px;margin:8px 0}
+.events .row{display:flex;justify-content:space-between;align-items:center;background:var(--subtle);padding:8px 10px;border-radius:10px;margin:6px 0;font-size:13px}
 .events .title{font-weight:600}
 .events .amt{font-weight:700}
 
-/* Footer nav */
+/* Footer icons */
 .footer{
   position:fixed;left:0;right:0;bottom:0;
   background:#fff;border-top:1px solid #e6e6ea;
-  padding:10px 16px;box-shadow:0 -3px 15px rgba(0,0,0,.05);
+  padding:12px 16px;box-shadow:0 -3px 15px rgba(0,0,0,.05);
 }
-.nav{
-  display:flex;justify-content:space-around;align-items:center;
-  gap:10px;max-width:500px;margin:0 auto;
+.chips{
+  display:flex;gap:14px;justify-content:center;
 }
-.icon-btn{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  color:#777;font-size:12px;cursor:pointer;transition:color .2s;
+.chip{
+  width:52px;height:52px;border:2px solid #f28e1c;border-radius:14px;opacity:.9;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s, transform .2s;
 }
-.icon-btn:hover{color:var(--accent)}
-.icon-btn i{font-size:22px;margin-bottom:2px}
-.icon-btn.active{color:var(--accent)}
+.chip.active{background:#f28e1c;color:#fff;transform:scale(1.05)}
+.chip i{font-size:22px;color:#f28e1c}
+.chip.active i{color:#fff}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <!-- Header Summary -->
+  <!-- Header -->
   <div class="card" id="summary">
     <h1>Time–Budget Dashboard <span class="pill">Demo</span></h1>
     <div class="subtitle" id="summaryText">Loading summary...</div>
@@ -136,22 +138,19 @@ h1,h2,h3{margin:0 0 12px}
   </div>
 </div>
 
-<!-- Footer Nav -->
+<!-- Footer -->
 <div class="footer">
-  <div class="nav">
-    <div class="icon-btn active"><i class="lucide lucide-home"></i><span>Home</span></div>
-    <div class="icon-btn"><i class="lucide lucide-calendar-days"></i><span>Schedule</span></div>
-    <div class="icon-btn"><i class="lucide lucide-piggy-bank"></i><span>Budget</span></div>
-    <div class="icon-btn"><i class="lucide lucide-activity"></i><span>Insights</span></div>
-    <div class="icon-btn"><i class="lucide lucide-settings"></i><span>Settings</span></div>
+  <div class="chips">
+    <div class="chip active"><i class="lucide lucide-home"></i></div>
+    <div class="chip"><i class="lucide lucide-calendar-days"></i></div>
+    <div class="chip"><i class="lucide lucide-piggy-bank"></i></div>
+    <div class="chip"><i class="lucide lucide-activity"></i></div>
+    <div class="chip"><i class="lucide lucide-settings"></i></div>
   </div>
 </div>
 
 <script>
 const DATA = {
-  salary:100000,
-  goal_monthly:833.33,
-  month_label:"June 2024",
   categories:[
     {category:"Dining",budget:150,spent:128},
     {category:"Work Expenses",budget:120,spent:45},
@@ -167,49 +166,38 @@ const DATA = {
   ]
 };
 
-/* Color and Formatting Helpers */
+/* Color helpers */
 function colorFor(p){if(p<70)return'var(--ok)';if(p<100)return'var(--warn)';return'var(--bad)';}
 function fmt(x){return '$'+x.toFixed(2);}
 
-/* Build Summary Header */
-function updateSummary(view){
-  const totalEvents = DATA.events_today.length;
-  const totalCost = DATA.events_today.reduce((a,b)=>a+b.expected,0);
-  const remainingBudget = Math.max(0,DATA.categories.reduce((a,b)=>a+(b.budget-b.spent),0));
-  document.getElementById('summaryText').innerHTML =
-    `<b>${totalEvents}</b> events scheduled • Expected cost <b>${fmt(totalCost)}</b> • Remaining budget <b>${fmt(remainingBudget)}</b>`;
-}
-
-/* Progress Bars */
-function buildBars(){
+/* Build Progress Bars */
+function buildBars(scale){
   const $bars=document.getElementById('bars');
   $bars.innerHTML='';
   DATA.categories.forEach(cat=>{
-    const label=document.createElement('div');
-    label.className='label';
-    label.textContent=cat.category;
-    $bars.appendChild(label);
-
+    const scaledBudget=cat.budget*scale;
+    const scaledSpent=cat.spent*scale;
+    const pctVal=Math.round((scaledSpent/scaledBudget)*100);
+    const barWrap=document.createElement('div');
+    barWrap.className='bar-wrap';
+    const label=document.createElement('div');label.className='label';label.textContent=cat.category;
     const bar=document.createElement('div');bar.className='bar';
     const fill=document.createElement('div');fill.className='fill';
     const pct=document.createElement('div');pct.className='pct';
     const hint=document.createElement('div');hint.className='hint';
     bar.appendChild(fill);bar.appendChild(pct);bar.appendChild(hint);
-    $bars.appendChild(bar);
+    barWrap.appendChild(label);barWrap.appendChild(bar);
+    $bars.appendChild(barWrap);
 
-    const pctVal=Math.round((cat.spent/cat.budget)*100);
     fill.style.width=Math.min(100,pctVal)+'%';
     fill.style.background=colorFor(pctVal);
     pct.textContent=pctVal+'%';
     if(pctVal>=45)pct.classList.add('invert');
-    hint.textContent=`${cat.category}: ${fmt(cat.spent)} of ${fmt(cat.budget)} used. Tooltip data: Forecast savings +${fmt(Math.random()*50+10)}.`;
-
-    bar.addEventListener('mouseenter',()=>{hint.style.opacity='1';});
-    bar.addEventListener('mouseleave',()=>{hint.style.opacity='0';});
+    hint.textContent=`${cat.category}: ${fmt(scaledSpent)} of ${fmt(scaledBudget)} used • Forecast savings +${fmt(Math.random()*50+10)}`;
   });
 }
 
-/* Event Rendering */
+/* Render Events */
 function renderEvents(){
   const $events=document.getElementById('events');
   const $summary=document.getElementById('eventSummary');
@@ -224,17 +212,28 @@ function renderEvents(){
     $events.appendChild(row);
   });
   const total=DATA.events_today.reduce((a,b)=>a+b.expected,0);
-  $summary.innerHTML=`You have <b>${DATA.events_today.length}</b> events scheduled today with an expected cost of <b>${fmt(total)}</b>.`;
-  document.getElementById('capline').textContent="Suggested weekly cap: "+fmt(200)+". Adjusting events may reduce total by "+fmt(45)+".";
+  $summary.innerHTML=`You have <b>${DATA.events_today.length}</b> events today totaling <b>${fmt(total)}</b>.`;
+  document.getElementById('capline').textContent="Weekly cap: "+fmt(200)+". Adjusting events may save "+fmt(45)+".";
 }
 
-/* View Switching */
-function viewHandler(view){
+/* Summary Header */
+function updateSummary(view){
+  const scale=view==='day'?0.05:(view==='week'?0.25:1);
+  const remainingBudget=Math.max(0,DATA.categories.reduce((a,b)=>a+(b.budget-b.spent),0)*scale);
+  const totalEvents = DATA.events_today.length;
+  const totalCost = DATA.events_today.reduce((a,b)=>a+b.expected,0)*scale;
+  document.getElementById('summaryText').innerHTML =
+    `<b>${totalEvents}</b> events • Cost <b>${fmt(totalCost)}</b> • Remaining <b>${fmt(remainingBudget)}</b>`;
+  return scale;
+}
+
+/* View Switch */
+function setView(view){
   document.querySelectorAll('.segmented button').forEach(b=>b.classList.remove('active'));
   document.getElementById('btn-'+view).classList.add('active');
-  document.getElementById('viewNote').textContent=`(Viewing ${view}-level budgets and spending)`;
-  updateSummary(view);
-  buildBars();
+  document.getElementById('viewNote').textContent=`(${view.charAt(0).toUpperCase()+view.slice(1)} view of budgets and spending)`;
+  const scale=updateSummary(view);
+  buildBars(scale);
   renderEvents();
 }
 
@@ -244,11 +243,11 @@ document.getElementById('whyLink').addEventListener('click',()=>{
   d.style.display=d.style.display==='block'?'none':'block';
 });
 
-/* Init */
-document.getElementById('btn-day').addEventListener('click',()=>viewHandler('day'));
-document.getElementById('btn-week').addEventListener('click',()=>viewHandler('week'));
-document.getElementById('btn-month').addEventListener('click',()=>viewHandler('month'));
-viewHandler('month');
+/* Initialize */
+document.getElementById('btn-day').addEventListener('click',()=>setView('day'));
+document.getElementById('btn-week').addEventListener('click',()=>setView('week'));
+document.getElementById('btn-month').addEventListener('click',()=>setView('month'));
+setView('month');
 </script>
 </body>
 </html>
