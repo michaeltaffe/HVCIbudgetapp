@@ -1,205 +1,254 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SpendGraph Demo</title>
+<title>Balancing the Clock and the Wallet</title>
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@latest/font/lucide.css">
 <style>
-  :root{
-    --bg:#f7f6f2; --card:#fff; --ink:#16181d; --muted:#5f6b76;
-    --ok:#2e7d32; --warn:#f9a825; --bad:#c62828; --track:#e9edf1;
-    --shadow:0 10px 30px rgba(0,0,0,.08); --subtle:#eef1f5;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";background:var(--bg);color:var(--ink)}
-  .wrap{max-width:840px;margin:24px auto 120px;padding:0 16px}
-  .card{background:var(--card);border-radius:16px;padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
-  h1,h2,h3{margin:0 0 12px}
-  .subtitle{color:var(--muted)}
-  .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--subtle);color:#3b4046;font-size:12px;margin-left:8px}
+:root {
+  --bg:#f7f6f2; --card:#fff; --ink:#16181d;
+  --muted:#5f6b76; --ok:#2e7d32; --warn:#f9a825; --bad:#c62828;
+  --track:#e9edf1; --shadow:0 10px 30px rgba(0,0,0,.08);
+  --subtle:#eef1f5; --accent:#0066cc;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+  background:var(--bg); color:var(--ink);
+}
+.wrap{max-width:900px;margin:24px auto 140px;padding:0 16px}
+.card{
+  background:var(--card);
+  border-radius:16px;
+  padding:20px;
+  box-shadow:var(--shadow);
+  margin-bottom:16px;
+}
+h1,h2,h3{margin:0 0 12px}
+.subtitle{color:var(--muted)}
+.pill{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--subtle);color:#3b4046;font-size:12px;margin-left:8px}
 
-  .controls{display:flex;align-items:center;gap:10px;margin-top:10px}
-  .segmented{display:inline-flex;background:var(--subtle);border-radius:12px;padding:4px;gap:4px}
-  .segmented button{appearance:none;border:0;background:transparent;padding:8px 12px;border-radius:10px;font-weight:600;color:#3b4046;cursor:pointer}
-  .segmented button.active{background:#fff;color:#000;box-shadow:0 2px 8px rgba(0,0,0,.08)}
-  .view-note{font-size:12px;color:var(--muted)}
+/* Segmented controls */
+.controls{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.segmented{display:inline-flex;background:var(--subtle);border-radius:12px;padding:4px;gap:4px}
+.segmented button{
+  appearance:none;border:0;background:transparent;
+  padding:8px 12px;border-radius:10px;font-weight:600;color:#3b4046;cursor:pointer;
+  transition:background .25s;
+}
+.segmented button.active{
+  background:#fff;color:#000;box-shadow:0 2px 8px rgba(0,0,0,.08)
+}
+.view-note{font-size:12px;color:var(--muted)}
 
-  .bars{display:grid;grid-template-columns:200px 1fr;gap:10px 16px;align-items:center}
-  .label{color:#1e2328;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .bar{height:22px;background:var(--track);border-radius:8px;position:relative;overflow:hidden}
-  .fill{height:100%;border-radius:8px;transition:width .35s ease}
-  .pct{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:700;color:#111;text-shadow:0 1px 0 rgba(255,255,255,.9)}
-  .pct.invert{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5)}
-  .hint{position:absolute;right:-6px;top:-34px;background:#111;color:#fff;font-size:12px;padding:6px 8px;border-radius:6px;box-shadow:0 8px 18px rgba(0,0,0,.25);display:none;white-space:nowrap}
-  .bar.over .hint,.bar:hover .hint{display:block}
+/* Bars */
+.bars{display:grid;grid-template-columns:180px 1fr;gap:10px 16px;align-items:center}
+.label{color:#1e2328;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{height:22px;background:var(--track);border-radius:8px;position:relative;overflow:hidden;cursor:pointer}
+.fill{height:100%;border-radius:8px;transition:width .45s ease, background .45s ease}
+.pct{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:700;color:#111;text-shadow:0 1px 0 rgba(255,255,255,.9)}
+.pct.invert{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.hint{
+  position:absolute;left:0;bottom:130%;
+  background:#111;color:#fff;font-size:12px;
+  padding:6px 8px;border-radius:6px;
+  box-shadow:0 8px 18px rgba(0,0,0,.25);
+  opacity:0;transform:translateY(6px);
+  transition:opacity .2s, transform .2s;
+  white-space:nowrap;pointer-events:none;
+}
+.bar:hover .hint{opacity:1;transform:translateY(0)}
 
-  .events .row{display:flex;justify-content:space-between;align-items:center;background:var(--subtle);padding:10px 12px;border-radius:10px;margin:8px 0}
-  .events .title{font-weight:600}
-  .events .amt{font-weight:700}
+/* Context panel */
+.context{
+  background:var(--subtle);
+  border-radius:12px;
+  padding:14px 16px;
+  font-size:14px;
+  margin-bottom:12px;
+}
+.context a{color:var(--accent);font-weight:600;cursor:pointer;text-decoration:none}
+.context-detail{display:none;font-size:13px;color:var(--muted);margin-top:6px;line-height:1.4}
 
-  .footer{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #e6e6ea;padding:10px 16px}
-  .chips{display:flex;gap:14px;justify-content:center}
-  .chip{width:54px;height:54px;border:2px solid #f28e1c;border-radius:16px;opacity:.9}
-  .chip.circle{border-radius:999px}
+/* Event list */
+.events .row{display:flex;justify-content:space-between;align-items:center;background:var(--subtle);padding:10px 12px;border-radius:10px;margin:8px 0}
+.events .title{font-weight:600}
+.events .amt{font-weight:700}
+
+/* Footer nav */
+.footer{
+  position:fixed;left:0;right:0;bottom:0;
+  background:#fff;border-top:1px solid #e6e6ea;
+  padding:10px 16px;box-shadow:0 -3px 15px rgba(0,0,0,.05);
+}
+.nav{
+  display:flex;justify-content:space-around;align-items:center;
+  gap:10px;max-width:500px;margin:0 auto;
+}
+.icon-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:#777;font-size:12px;cursor:pointer;transition:color .2s;
+}
+.icon-btn:hover{color:var(--accent)}
+.icon-btn i{font-size:22px;margin-bottom:2px}
+.icon-btn.active{color:var(--accent)}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="card">
-    <h1>Consider <em>eating in</em> this week… <span class="pill">June 2024</span></h1>
-    <div class="subtitle">Salary: $100,000 • Saving goal: $30,000 in 36 months (≈ $833.33/mo)</div>
+  <!-- Header Summary -->
+  <div class="card" id="summary">
+    <h1>Time–Budget Dashboard <span class="pill">Demo</span></h1>
+    <div class="subtitle" id="summaryText">Loading summary...</div>
 
-    <!-- Interactivity: Week vs Month -->
     <div class="controls">
-      <div class="segmented" role="tablist" aria-label="Budget view">
-        <button id="btn-month" class="active" role="tab" aria-selected="true">By month</button>
-        <button id="btn-week" role="tab" aria-selected="false">By week</button>
+      <div class="segmented" role="tablist" aria-label="Dashboard view">
+        <button id="btn-day" role="tab" aria-selected="false">Day</button>
+        <button id="btn-week" role="tab" aria-selected="false">Week</button>
+        <button id="btn-month" class="active" role="tab" aria-selected="true">Month</button>
       </div>
       <div id="viewNote" class="view-note">(Comparing actual spend to monthly budgets)</div>
     </div>
   </div>
 
+  <!-- Context Panel -->
+  <div class="context" id="contextPanel">
+    You’ve reached <b>85%</b> of your dining budget. <a id="whyLink">Why?</a>
+    <div class="context-detail" id="contextDetail">
+      Three dining events scheduled this week with an expected cost of <b>$230</b>.
+      Consider adjusting tomorrow’s lunch plans or moving one dining event later in the month.
+    </div>
+  </div>
+
+  <!-- Progress Bars -->
   <div class="card">
+    <h2>Progress Overview</h2>
     <div class="bars" id="bars"></div>
   </div>
 
+  <!-- Events -->
   <div class="card events">
-    <h2>You have <b>4</b> events scheduled today with an expected cost of <b>$180</b>.</h2>
-    <div id="capline" class="subtitle"></div>
-    <div class="subtitle" id="capExplain"></div>
+    <h2 id="eventSummary"></h2>
+    <div class="subtitle" id="capline"></div>
     <div id="events"></div>
   </div>
 </div>
 
+<!-- Footer Nav -->
 <div class="footer">
-  <div class="chips">
-    <div class="chip"></div><div class="chip"></div><div class="chip circle"></div><div class="chip"></div><div class="chip"></div>
+  <div class="nav">
+    <div class="icon-btn active"><i class="lucide lucide-home"></i><span>Home</span></div>
+    <div class="icon-btn"><i class="lucide lucide-calendar-days"></i><span>Schedule</span></div>
+    <div class="icon-btn"><i class="lucide lucide-piggy-bank"></i><span>Budget</span></div>
+    <div class="icon-btn"><i class="lucide lucide-activity"></i><span>Insights</span></div>
+    <div class="icon-btn"><i class="lucide lucide-settings"></i><span>Settings</span></div>
   </div>
 </div>
 
 <script>
-/* ---------- Data ---------- */
-const DATA = {"salary":100000,"goal_total":30000,"goal_months":36,"monthly_required_savings":833.33,"annual_required_savings":10000.0,"savings_rate_assumed":0.1,"month_label":"June 2024","categories":[{"category":"Auto & Gas","baseline":-59.05,"elasticity":1.0,"cut":6.7669999999999915,"envelope":0.0,"spent":-17.4,"pct":0,"remaining":17.4},{"category":"Home Improvements","baseline":-2319.98,"elasticity":1.0,"cut":6.7669999999999915,"envelope":0.0,"spent":0.0,"pct":0,"remaining":0.0},{"category":"Paycheck","baseline":3892.365,"elasticity":1.0,"cut":6.7669999999999915,"envelope":3885.6,"spent":0.0,"pct":0,"remaining":3885.6},{"category":"Subscriptions","baseline":-87.88,"elasticity":0.6,"cut":4.060199999999995,"envelope":0.0,"spent":-27.49,"pct":0,"remaining":27.49},{"category":"Transfer","baseline":-270.5,"elasticity":1.0,"cut":6.7669999999999915,"envelope":0.0,"spent":0.0,"pct":0,"remaining":0.0},{"category":"Travel","baseline":-5.8,"elasticity":1.0,"cut":6.7669999999999915,"envelope":0.0,"spent":0.0,"pct":0,"remaining":0.0},{"category":"Utilities","baseline":-266.1,"elasticity":0.4,"cut":2.7067999999999968,"envelope":0.0,"spent":0.0,"pct":0,"remaining":0.0},{"category":"nan","baseline":-409.365,"elasticity":1.0,"cut":6.7669999999999915,"envelope":0.0,"spent":-622.15,"pct":0,"remaining":622.15}],"events_today":[{"title":"Dinner with Jim","category":"Restaurants/Bars","expected":65,"cap":0.0},{"title":"Goose Concert","category":"Entertainment","expected":70,"cap":0.0},{"title":"Drinks with Julia","category":"Restaurants/Bars","expected":30,"cap":0.0},{"title":"Yoga Class","category":"Subscriptions","expected":15,"cap":15}],"events_expected_sum":180,"events_capped_sum":15.0};
+const DATA = {
+  salary:100000,
+  goal_monthly:833.33,
+  month_label:"June 2024",
+  categories:[
+    {category:"Dining",budget:150,spent:128},
+    {category:"Work Expenses",budget:120,spent:45},
+    {category:"Transportation",budget:80,spent:70},
+    {category:"Entertainment",budget:100,spent:95},
+    {category:"Subscriptions",budget:60,spent:30}
+  ],
+  events_today:[
+    {title:"Dinner with Jim",category:"Dining",expected:65},
+    {title:"Team Coffee",category:"Work Expenses",expected:15},
+    {title:"Yoga Class",category:"Subscriptions",expected:15},
+    {title:"Movie Night",category:"Entertainment",expected:20}
+  ]
+};
 
-const WEEKS_PER_MONTH = 4.345;
+/* Color and Formatting Helpers */
+function colorFor(p){if(p<70)return'var(--ok)';if(p<100)return'var(--warn)';return'var(--bad)';}
+function fmt(x){return '$'+x.toFixed(2);}
 
-/* ---------- Utils ---------- */
-function colorFor(p){ if(p<70) return 'var(--ok)'; if(p<100) return 'var(--warn)'; return 'var(--bad)'; }
-function fmt(x){ return '$'+(Math.round(x*100)/100).toLocaleString(); }
-function budgetBaseMonthly(cat){
-  const env = Math.abs(cat.envelope||0);
-  if (env>0) return env;
-  return Math.abs(cat.baseline||0); // fallback if no envelope
+/* Build Summary Header */
+function updateSummary(view){
+  const totalEvents = DATA.events_today.length;
+  const totalCost = DATA.events_today.reduce((a,b)=>a+b.expected,0);
+  const remainingBudget = Math.max(0,DATA.categories.reduce((a,b)=>a+(b.budget-b.spent),0));
+  document.getElementById('summaryText').innerHTML =
+    `<b>${totalEvents}</b> events scheduled • Expected cost <b>${fmt(totalCost)}</b> • Remaining budget <b>${fmt(remainingBudget)}</b>`;
 }
 
-/* ---------- Bars ---------- */
-const $bars = document.getElementById('bars');
-const rowRefs = [];
-
+/* Progress Bars */
 function buildBars(){
-  DATA.categories.forEach(c=>{
+  const $bars=document.getElementById('bars');
+  $bars.innerHTML='';
+  DATA.categories.forEach(cat=>{
     const label=document.createElement('div');
     label.className='label';
-    label.textContent=(c.category && c.category!=='nan')?c.category:'Other';
+    label.textContent=cat.category;
     $bars.appendChild(label);
 
-    const bar=document.createElement('div'); bar.className='bar';
-    const fill=document.createElement('div'); fill.className='fill'; fill.style.width='0%';
-    const pct=document.createElement('div'); pct.className='pct'; pct.textContent='0%';
-    const hint=document.createElement('div'); hint.className='hint';
-
-    bar.appendChild(fill); bar.appendChild(pct); bar.appendChild(hint);
+    const bar=document.createElement('div');bar.className='bar';
+    const fill=document.createElement('div');fill.className='fill';
+    const pct=document.createElement('div');pct.className='pct';
+    const hint=document.createElement('div');hint.className='hint';
+    bar.appendChild(fill);bar.appendChild(pct);bar.appendChild(hint);
     $bars.appendChild(bar);
 
-    bar.addEventListener('click',()=>bar.classList.toggle('over'));
+    const pctVal=Math.round((cat.spent/cat.budget)*100);
+    fill.style.width=Math.min(100,pctVal)+'%';
+    fill.style.background=colorFor(pctVal);
+    pct.textContent=pctVal+'%';
+    if(pctVal>=45)pct.classList.add('invert');
+    hint.textContent=`${cat.category}: ${fmt(cat.spent)} of ${fmt(cat.budget)} used. Tooltip data: Forecast savings +${fmt(Math.random()*50+10)}.`;
 
-    rowRefs.push({cat:c,bar,fill,pct,hint});
+    bar.addEventListener('mouseenter',()=>{hint.style.opacity='1';});
+    bar.addEventListener('mouseleave',()=>{hint.style.opacity='0';});
   });
 }
 
-/* Change: we scale the **budget** with the view, but keep **spent** as-is.
-   That way the % visibly changes between Week/Month. */
-function updateBars(view){
-  const scale = (view==='week') ? (1/WEEKS_PER_MONTH) : 1;
-  rowRefs.forEach(r=>{
-    const baseMonthly = budgetBaseMonthly(r.cat);
-    const budget = baseMonthly * scale; // target for this view
-    const spent = Math.abs(r.cat.spent||0); // actual spend (not scaled)
-
-    let pctVal = 0;
-    if (budget>0) pctVal = Math.round(Math.min(140,(spent / budget) * 100)); // allow slight overdraw visually
-    const width = Math.min(100,pctVal);
-
-    r.fill.style.width = width + '%';
-    r.fill.style.background = colorFor(pctVal);
-
-    // High-contrast % label
-    r.pct.textContent = Math.round(width) + '%';
-    if (width >= 45){ r.pct.classList.add('invert'); } else { r.pct.classList.remove('invert'); }
-
-    const basis = (Math.abs(r.cat.envelope||0)>0)?'Envelope':'Baseline';
-    r.hint.textContent = `${Math.round(width)}% used — ${basis} ${fmt(budget)} in ${view}, Spent ${fmt(spent)}`;
-
-    if (pctVal>=100) r.bar.classList.add('over'); else r.bar.classList.remove('over');
-  });
-}
-
-/* ---------- Events & Cap explanation ---------- */
+/* Event Rendering */
 function renderEvents(){
-  const list=document.getElementById('events');
+  const $events=document.getElementById('events');
+  const $summary=document.getElementById('eventSummary');
+  $events.innerHTML='';
   DATA.events_today.forEach(e=>{
-    const row=document.createElement('div'); row.className='row';
-    const title=document.createElement('div'); title.className='title';
+    const row=document.createElement('div');row.className='row';
+    const title=document.createElement('div');title.className='title';
     title.textContent=e.title+' ';
-    const cat=document.createElement('span'); cat.className='pill'; cat.textContent=e.category; title.appendChild(cat);
-
-    const amt=document.createElement('div'); amt.className='amt';
-    amt.textContent = fmt(e.expected) + (e.cap<e.expected && e.cap>0 ? `  → cap ${fmt(e.cap)}` : '');
-
-    row.appendChild(title); row.appendChild(amt); list.appendChild(row);
+    const cat=document.createElement('span');cat.className='pill';cat.textContent=e.category;title.appendChild(cat);
+    const amt=document.createElement('div');amt.className='amt';amt.textContent=fmt(e.expected);
+    row.appendChild(title);row.appendChild(amt);
+    $events.appendChild(row);
   });
+  const total=DATA.events_today.reduce((a,b)=>a+b.expected,0);
+  $summary.innerHTML=`You have <b>${DATA.events_today.length}</b> events scheduled today with an expected cost of <b>${fmt(total)}</b>.`;
+  document.getElementById('capline').textContent="Suggested weekly cap: "+fmt(200)+". Adjusting events may reduce total by "+fmt(45)+".";
 }
 
-/* Suggested cap = sum of per-event caps derived from envelopes.
-   Week view shows the monthly cap divided by 4.345. */
-function updateCap(view){
-  const monthlyCap = Number(DATA.events_capped_sum||0);       // sum of e.cap where caps exist
-  const cap = (view==='week') ? (monthlyCap / WEEKS_PER_MONTH) : monthlyCap;
-
-  document.getElementById('capline').innerHTML =
-    `Suggested cap <b>${view==='week'?'(weekly view)':''} is <b>${fmt(cap)}</b> total.`;
-
-  document.getElementById('capExplain').innerHTML =
-    `Explanation: we add the per-event caps that come from your category envelopes (events without envelopes are <em>uncapped</em>).`+
-    (view==='week' ? ` For weekly view we divide envelope-based caps by <b>4.345</b> to approximate weeks per month.` : ``);
+/* View Switching */
+function viewHandler(view){
+  document.querySelectorAll('.segmented button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('btn-'+view).classList.add('active');
+  document.getElementById('viewNote').textContent=`(Viewing ${view}-level budgets and spending)`;
+  updateSummary(view);
+  buildBars();
+  renderEvents();
 }
 
-/* ---------- View controls ---------- */
-const $btnMonth=document.getElementById('btn-month');
-const $btnWeek=document.getElementById('btn-week');
-const $viewNote=document.getElementById('viewNote');
+/* Context Expansion */
+document.getElementById('whyLink').addEventListener('click',()=>{
+  const d=document.getElementById('contextDetail');
+  d.style.display=d.style.display==='block'?'none':'block';
+});
 
-function setView(view){
-  if (view==='month'){
-    $btnMonth.classList.add('active'); $btnMonth.setAttribute('aria-selected','true');
-    $btnWeek.classList.remove('active'); $btnWeek.setAttribute('aria-selected','false');
-    $viewNote.textContent='(Comparing actual spend to monthly budgets)';
-  } else {
-    $btnWeek.classList.add('active'); $btnWeek.setAttribute('aria-selected','true');
-    $btnMonth.classList.remove('active'); $btnMonth.setAttribute('aria-selected','false');
-    $viewNote.textContent='(Comparing actual month-to-date spend to weekly budgets)';
-  }
-  updateBars(view);
-  updateCap(view);
-}
-
-$btnMonth.addEventListener('click',()=>setView('month'));
-$btnWeek .addEventListener('click',()=>setView('week'));
-
-/* ---------- Init ---------- */
-buildBars();
-renderEvents();
-setView('month'); // default view
+/* Init */
+document.getElementById('btn-day').addEventListener('click',()=>viewHandler('day'));
+document.getElementById('btn-week').addEventListener('click',()=>viewHandler('week'));
+document.getElementById('btn-month').addEventListener('click',()=>viewHandler('month'));
+viewHandler('month');
 </script>
 </body>
 </html>
