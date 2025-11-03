@@ -143,8 +143,8 @@ h1,h2,h3{margin:0 0 10px}
   <div class="chips">
     <div class="chip active"><i class="lucide lucide-home"></i></div>
     <div class="chip"><i class="lucide lucide-calendar-days"></i></div>
-    <div class="chip"><i class="lucide lucide-piggy-bank"></i></div>
-    <div class="chip"><i class="lucide lucide-activity"></i></div>
+    <div class="chip"><i class="lucide lucide-credit-card"></i></div>
+    <div class="chip"><i class="lucide lucide-bar-chart-3"></i></div>
     <div class="chip"><i class="lucide lucide-settings"></i></div>
   </div>
 </div>
@@ -175,9 +175,9 @@ function buildBars(scale){
   const $bars=document.getElementById('bars');
   $bars.innerHTML='';
   DATA.categories.forEach(cat=>{
-    const scaledBudget=cat.budget*scale;
-    const scaledSpent=cat.spent*scale;
-    const pctVal=Math.round((scaledSpent/scaledBudget)*100);
+    const scaledBudget = cat.budget * scale;
+    const scaledSpent = cat.spent * scale;
+    const pctVal = Math.round((scaledSpent / scaledBudget) * 100);
     const barWrap=document.createElement('div');
     barWrap.className='bar-wrap';
     const label=document.createElement('div');label.className='label';label.textContent=cat.category;
@@ -198,7 +198,7 @@ function buildBars(scale){
 }
 
 /* Render Events */
-function renderEvents(){
+function renderEvents(scale){
   const $events=document.getElementById('events');
   const $summary=document.getElementById('eventSummary');
   $events.innerHTML='';
@@ -207,18 +207,18 @@ function renderEvents(){
     const title=document.createElement('div');title.className='title';
     title.textContent=e.title+' ';
     const cat=document.createElement('span');cat.className='pill';cat.textContent=e.category;title.appendChild(cat);
-    const amt=document.createElement('div');amt.className='amt';amt.textContent=fmt(e.expected);
+    const amt=document.createElement('div');amt.className='amt';amt.textContent=fmt(e.expected*scale);
     row.appendChild(title);row.appendChild(amt);
     $events.appendChild(row);
   });
-  const total=DATA.events_today.reduce((a,b)=>a+b.expected,0);
+  const total=DATA.events_today.reduce((a,b)=>a+b.expected,0)*scale;
   $summary.innerHTML=`You have <b>${DATA.events_today.length}</b> events today totaling <b>${fmt(total)}</b>.`;
-  document.getElementById('capline').textContent="Weekly cap: "+fmt(200)+". Adjusting events may save "+fmt(45)+".";
+  document.getElementById('capline').textContent="Weekly cap: "+fmt(200*scale)+". Adjusting events may save "+fmt(45*scale)+".";
 }
 
 /* Summary Header */
 function updateSummary(view){
-  const scale=view==='day'?0.05:(view==='week'?0.25:1);
+  const scale = view==='day'?0.05:(view==='week'?0.25:1);
   const remainingBudget=Math.max(0,DATA.categories.reduce((a,b)=>a+(b.budget-b.spent),0)*scale);
   const totalEvents = DATA.events_today.length;
   const totalCost = DATA.events_today.reduce((a,b)=>a+b.expected,0)*scale;
@@ -234,7 +234,7 @@ function setView(view){
   document.getElementById('viewNote').textContent=`(${view.charAt(0).toUpperCase()+view.slice(1)} view of budgets and spending)`;
   const scale=updateSummary(view);
   buildBars(scale);
-  renderEvents();
+  renderEvents(scale);
 }
 
 /* Context Expansion */
