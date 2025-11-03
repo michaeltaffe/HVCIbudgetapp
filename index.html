@@ -3,29 +3,38 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Balancing the Clock and the Wallet</title>
+<title>Time–Budget Dashboard (Mock)</title>
 <link rel="stylesheet" href="https://unpkg.com/lucide-static@latest/font/lucide.css">
 <style>
-:root {
-  --bg:#f7f6f2; --card:#fff; --ink:#16181d;
-  --muted:#5f6b76; --ok:#2e7d32; --warn:#f9a825; --bad:#c62828;
-  --track:#e9edf1; --shadow:0 6px 22px rgba(0,0,0,.08);
-  --subtle:#eef1f5; --accent:#0066cc;
+:root{
+  --bg:#f7f6f2; --card:#fff; --ink:#16181d; --muted:#5f6b76;
+  --ok:#2e7d32; --warn:#f9a825; --bad:#c62828; --track:#e9edf1;
+  --shadow:0 6px 22px rgba(0,0,0,.08); --subtle:#eef1f5; --accent:#0066cc;
 }
+*{box-sizing:border-box}
 body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--ink)}
 .wrap{max-width:480px;margin:16px auto 100px;padding:0 12px}
 .card{background:var(--card);border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px}
 h1,h2{margin:0 0 10px}
 .subtitle{color:var(--muted);font-size:13px}
-.controls{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
-.segmented{display:flex;background:var(--subtle);border-radius:12px;padding:3px}
-.segmented button{border:0;background:none;padding:6px 10px;border-radius:8px;cursor:pointer;font-weight:600}
-.segmented button.active{background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+
+.controls{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.segmented{display:inline-flex;background:var(--subtle);border-radius:12px;padding:3px;gap:3px}
+.segmented button{
+  appearance:none;border:0;background:transparent;padding:6px 10px;border-radius:10px;
+  font-weight:600;color:#3b4046;cursor:pointer;font-size:13px;transition:background .2s
+}
+.segmented button.active{background:#fff;color:#000;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+
 .bars{display:grid;gap:12px}
-.bar{height:18px;background:var(--track);border-radius:8px;position:relative;overflow:hidden}
-.fill{height:100%;border-radius:8px;transition:width .4s ease}
-.pct{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:#111}
-.footer{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #ddd;padding:12px 16px;box-shadow:0 -3px 10px rgba(0,0,0,.05)}
+.row{display:flex;align-items:center;gap:10px}
+.label{min-width:120px;font-weight:600;font-size:13px}
+.bar{flex:1;height:18px;background:var(--track);border-radius:8px;position:relative;overflow:hidden}
+.fill{height:100%;border-radius:8px;transition:width .35s ease, background .35s ease}
+.pct{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700}
+.tooltip{font-size:11px;color:var(--muted)}
+
+.footer{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #e6e6ea;padding:12px 16px;box-shadow:0 -3px 15px rgba(0,0,0,.05)}
 .chips{display:flex;gap:14px;justify-content:center}
 .chip{width:52px;height:52px;border:2px solid #f28e1c;border-radius:14px;display:flex;align-items:center;justify-content:center}
 .chip i{font-size:22px;color:#f28e1c}
@@ -36,86 +45,131 @@ h1,h2{margin:0 0 10px}
   <div class="card">
     <h1>Time–Budget Dashboard</h1>
     <div class="controls">
-      <div class="segmented">
-        <button id="btn-day">Day</button>
-        <button id="btn-week">Week</button>
-        <button id="btn-month" class="active">Month</button>
+      <div class="segmented" role="tablist" aria-label="Time view">
+        <button id="view-day"   role="tab" aria-selected="false">Day</button>
+        <button id="view-week"  role="tab" aria-selected="false">Week</button>
+        <button id="view-month" role="tab" aria-selected="true"  class="active">Month</button>
       </div>
       <div class="subtitle" id="viewNote">(Month view)</div>
     </div>
+    <div class="subtitle" id="summary">Loading…</div>
   </div>
 
   <div class="card">
     <h2>Progress Overview</h2>
+    <div id="activeView" class="tooltip">Active view: month</div>
     <div class="bars" id="bars"></div>
+  </div>
+
+  <div class="card">
+    <h2>Context</h2>
+    <div class="subtitle">You’ve reached 85% of your dining budget. <span class="tooltip">(dummy tip)</span></div>
   </div>
 </div>
 
 <div class="footer">
   <div class="chips">
-    <div class="chip"><i class="lucide lucide-home"></i></div>
-    <div class="chip"><i class="lucide lucide-calendar-days"></i></div>
-    <div class="chip"><i class="lucide lucide-credit-card"></i></div>
-    <div class="chip"><i class="lucide lucide-bar-chart-3"></i></div>
-    <div class="chip"><i class="lucide lucide-settings"></i></div>
+    <div class="chip" title="Home"><i class="lucide lucide-home"></i></div>
+    <div class="chip" title="Calendar"><i class="lucide lucide-calendar-days"></i></div>
+    <div class="chip" title="Budget"><i class="lucide lucide-credit-card"></i></div>
+    <div class="chip" title="Insights"><i class="lucide lucide-bar-chart-3"></i></div>
+    <div class="chip" title="Settings"><i class="lucide lucide-settings"></i></div>
   </div>
 </div>
 
 <script>
-const DATASETS = {
+/* Distinct datasets per view (so bars CHANGE) */
+const DATA = {
   day: [
-    {category:"Dining", spent:10, budget:20},
-    {category:"Work", spent:4, budget:10},
-    {category:"Transport", spent:8, budget:8},
-    {category:"Leisure", spent:2, budget:15}
+    {category:"Dining",        spent:  9, budget: 15},  // 60%
+    {category:"Work Expenses", spent:  4, budget: 20},  // 20%
+    {category:"Transportation",spent: 10, budget: 12},  // 83%
+    {category:"Entertainment", spent:  1, budget:  8},  // 13%
+    {category:"Subscriptions", spent:  5, budget:  5}   // 100%
   ],
   week: [
-    {category:"Dining", spent:75, budget:100},
-    {category:"Work", spent:40, budget:60},
-    {category:"Transport", spent:25, budget:40},
-    {category:"Leisure", spent:20, budget:50}
+    {category:"Dining",        spent: 62, budget: 80},  // 78%
+    {category:"Work Expenses", spent: 18, budget: 60},  // 30%
+    {category:"Transportation",spent: 39, budget: 45},  // 87%
+    {category:"Entertainment", spent: 28, budget: 50},  // 56%
+    {category:"Subscriptions", spent: 15, budget: 15}   // 100%
   ],
   month: [
-    {category:"Dining", spent:250, budget:300},
-    {category:"Work", spent:180, budget:200},
-    {category:"Transport", spent:140, budget:160},
-    {category:"Leisure", spent:120, budget:200}
+    {category:"Dining",        spent:128, budget:150},  // 85%
+    {category:"Work Expenses", spent: 45, budget:120},  // 38%
+    {category:"Transportation",spent: 70, budget: 80},  // 88%
+    {category:"Entertainment", spent: 95, budget:100},  // 95%
+    {category:"Subscriptions", spent: 30, budget: 60}   // 50%
   ]
 };
 
-function colorFor(p){if(p<70)return'var(--ok)';if(p<100)return'var(--warn)';return'var(--bad)';}
+function colorFor(p){ return p<70 ? 'var(--ok)' : (p<100 ? 'var(--warn)' : 'var(--bad)'); }
 
-function render(view){
-  document.querySelectorAll('.segmented button').forEach(b=>b.classList.remove('active'));
-  document.getElementById('btn-'+view).classList.add('active');
-  document.getElementById('viewNote').textContent=`(${view[0].toUpperCase()+view.slice(1)} view)`;
-  
-  const bars=document.getElementById('bars');
-  bars.innerHTML='';
-  DATASETS[view].forEach(d=>{
-    const bar=document.createElement('div');
-    const pct=Math.round(d.spent/d.budget*100);
-    bar.className='bar';
-    const fill=document.createElement('div');
-    fill.className='fill';
-    fill.style.width=Math.min(100,pct)+'%';
-    fill.style.background=colorFor(pct);
-    const pctText=document.createElement('div');
-    pctText.className='pct';
-    pctText.textContent=pct+'%';
+/* Renders bars for a given view key */
+function renderBars(view){
+  const bars = document.getElementById('bars');
+  bars.innerHTML = ''; // clear previous bars
+
+  // Update helper labels
+  document.getElementById('activeView').textContent = 'Active view: ' + view;
+  document.getElementById('viewNote').textContent = '(' + view[0].toUpperCase() + view.slice(1) + ' view)';
+
+  // Build rows
+  DATA[view].forEach(d=>{
+    const row = document.createElement('div');
+    row.className = 'row';
+
+    const label = document.createElement('div');
+    label.className = 'label';
+    label.textContent = d.category;
+
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+
+    const pct = Math.round((d.spent / Math.max(1, d.budget)) * 100);
+    const fill = document.createElement('div');
+    fill.className = 'fill';
+    fill.style.width = Math.min(100, pct) + '%';
+    fill.style.background = colorFor(pct);
+
+    const pctText = document.createElement('div');
+    pctText.className = 'pct';
+    pctText.textContent = pct + '%';
+
     bar.appendChild(fill);
     bar.appendChild(pctText);
-    const label=document.createElement('div');
-    label.textContent=`${d.category}: $${d.spent} of $${d.budget}`;
-    bars.appendChild(label);
-    bars.appendChild(bar);
+
+    row.appendChild(label);
+    row.appendChild(bar);
+    bars.appendChild(row);
+
+    // Tooltip row under each bar with raw values (dummy)
+    const tip = document.createElement('div');
+    tip.className = 'tooltip';
+    tip.textContent = `${d.category}: $${d.spent} of $${d.budget} used • tip: shift one event to save ~$${10 + Math.floor(Math.random()*25)}`;
+    bars.appendChild(tip);
   });
+
+  // Update summary totals
+  const totalBudget = DATA[view].reduce((a,b)=>a + b.budget, 0);
+  const totalSpent  = DATA[view].reduce((a,b)=>a + b.spent, 0);
+  document.getElementById('summary').textContent =
+    `Total: $${totalSpent} of $${totalBudget} (${Math.round(totalSpent / Math.max(1,totalBudget) * 100)}%)`;
 }
 
-document.getElementById('btn-day').onclick=()=>render('day');
-document.getElementById('btn-week').onclick=()=>render('week');
-document.getElementById('btn-month').onclick=()=>render('month');
-render('month');
+/* Button wiring */
+function activate(view){
+  document.querySelectorAll('.segmented button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  renderBars(view);
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('view-day').addEventListener('click',  ()=>activate('day'));
+  document.getElementById('view-week').addEventListener('click', ()=>activate('week'));
+  document.getElementById('view-month').addEventListener('click',()=>activate('month'));
+  activate('month'); // initial
+});
 </script>
 </body>
 </html>
