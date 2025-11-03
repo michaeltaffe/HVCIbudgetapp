@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Time–Budget Dashboard (Final Prototype)</title>
 <link rel="stylesheet" href="https://unpkg.com/lucide-static@latest/font/lucide.css">
 <style>
-:root{
+:root {
   --bg:#f7f6f2; --card:#fff; --ink:#16181d; --muted:#5f6b76;
   --ok:#2e7d32; --warn:#f9a825; --bad:#c62828; --track:#e9edf1;
-  --shadow:0 6px 22px rgba(0,0,0,.08); --subtle:#eef1f5; --accent:#0066cc;
+  --shadow:0 6px 20px rgba(0,0,0,.08); --subtle:#eef1f5; --accent:#0066cc;
 }
 *{box-sizing:border-box}
-body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--ink)}
+body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--ink)}
 .wrap{max-width:480px;margin:16px auto 100px;padding:0 12px}
 .card{background:var(--card);border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px}
 h1,h2{margin:0 0 10px}
@@ -21,47 +21,42 @@ h1,h2{margin:0 0 10px}
 /* Controls */
 .controls{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
 .segmented{display:inline-flex;background:var(--subtle);border-radius:12px;padding:3px;gap:3px}
-.segmented button{
-  appearance:none;border:0;background:transparent;padding:6px 10px;border-radius:10px;
-  font-weight:600;color:#3b4046;cursor:pointer;font-size:13px;transition:background .2s
-}
+.segmented button{appearance:none;border:0;background:transparent;padding:6px 10px;border-radius:10px;font-weight:600;color:#3b4046;cursor:pointer;font-size:13px;transition:background .2s}
 .segmented button.active{background:#fff;color:#000;box-shadow:0 2px 6px rgba(0,0,0,.08)}
 
-/* Context */
-.context{
-  background:var(--subtle);border-radius:12px;padding:10px 12px;margin-top:10px;font-size:13px;line-height:1.35
-}
+/* Context panel */
+.context{background:var(--subtle);border-radius:12px;padding:10px 12px;margin-top:10px;font-size:13px;line-height:1.35}
 .context a{color:var(--accent);font-weight:600;text-decoration:none;cursor:pointer}
 .context .why{display:none;color:var(--muted);margin-top:6px;font-size:12px}
 
-/* Bars */
-.bars{display:grid;gap:12px;margin-top:6px}
+/* Progress bars */
+.bars{display:grid;gap:12px;margin-top:10px;margin-bottom:16px}
 .row{display:flex;align-items:center;gap:10px}
-.label{min-width:120px;font-weight:600;font-size:13px}
+.label{min-width:110px;font-weight:600;font-size:13px}
 .bar{flex:1;height:18px;background:var(--track);border-radius:8px;position:relative;overflow:hidden;cursor:pointer}
 .fill{height:100%;border-radius:8px;transition:width .35s ease, background .35s ease}
 .pct{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700}
-.hint{
-  position:absolute;left:0;bottom:125%;background:#111;color:#fff;font-size:11px;
+.hint{position:absolute;left:0;bottom:125%;background:#111;color:#fff;font-size:11px;
   padding:5px 8px;border-radius:6px;box-shadow:0 6px 14px rgba(0,0,0,.2);
-  opacity:0;transform:translateY(6px);transition:opacity .2s, transform .2s;white-space:nowrap;pointer-events:none
-}
+  opacity:0;transform:translateY(6px);transition:opacity .2s, transform .2s;white-space:nowrap;pointer-events:none}
 .bar:hover .hint{opacity:1;transform:translateY(0)}
 
-/* Events (Upcoming Schedule Sample) */
+/* Events */
+.events h2{margin-bottom:6px}
 .events .item{display:flex;justify-content:space-between;align-items:center;background:var(--subtle);
-  padding:10px 12px;border-radius:10px;margin:8px 0}
+  padding:10px 12px;border-radius:10px;margin:6px 0}
 .events .title{font-weight:600;font-size:13px}
-.pill{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;background:#fff;font-size:11px;border:1px solid #e5e9ee;color:#3b4046}
+.pill{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;background:#fff;font-size:11px;
+  border:1px solid #e5e9ee;color:#3b4046}
 .events .amt{font-weight:700;font-size:13px}
+#events{min-height:60px}
 
-/* Footer (square icon buttons) */
-.footer{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #e6e6ea;padding:12px 16px;box-shadow:0 -3px 15px rgba(0,0,0,.05)}
+/* Footer */
+.footer{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #e6e6ea;
+  padding:12px 16px;box-shadow:0 -3px 15px rgba(0,0,0,.05)}
 .chips{display:flex;gap:14px;justify-content:center}
-.chip{
-  width:52px;height:52px;border:2px solid #f28e1c;border-radius:14px;background:#fff;
-  display:flex;align-items:center;justify-content:center;transition:background .2s, transform .2s
-}
+.chip{width:52px;height:52px;border:2px solid #f28e1c;border-radius:14px;background:#fff;
+  display:flex;align-items:center;justify-content:center;transition:background .2s, transform .2s}
 .chip:hover{background:#fdf5e6;transform:translateY(-1px)}
 .chip i{font-size:22px;color:#f28e1c}
 .active-chip{background:#f28e1c}
@@ -70,34 +65,30 @@ h1,h2{margin:0 0 10px}
 </head>
 <body>
 <div class="wrap">
-  <!-- Header / Controls -->
   <div class="card">
     <h1>Time–Budget Dashboard</h1>
     <div class="controls">
-      <div class="segmented" role="tablist" aria-label="Time view">
-        <button id="btn-day"   role="tab" aria-selected="false">Day</button>
-        <button id="btn-week"  role="tab" aria-selected="false">Week</button>
-        <button id="btn-month" role="tab" aria-selected="true" class="active">Month</button>
+      <div class="segmented">
+        <button id="btn-day">Day</button>
+        <button id="btn-week">Week</button>
+        <button id="btn-month" class="active">Month</button>
       </div>
       <div class="subtitle" id="viewNote">(Month view)</div>
     </div>
 
-    <!-- Smart Context Panel -->
     <div class="context">
-      <span id="contextMain">Dining is at 85% of its limit. Consider one low-cost workday.</span>
+      <span id="contextMain">Dining is at 85% of its limit. Consider skipping one meal out next week.</span>
       &nbsp;<a id="whyLink">Why?</a>
-      <div id="contextWhy" class="why">Three dining events are planned this week (~$230). Two occur on days with other paid activities, pushing you past your weekly target.</div>
+      <div id="contextWhy" class="why">Three dining events (~$230) fall in the same pay period as subscriptions and entertainment charges.</div>
     </div>
   </div>
 
-  <!-- Progress Overview -->
   <div class="card">
     <h2>Progress Overview</h2>
-    <div class="subtitle" id="summary">Loading…</div>
+    <div class="subtitle" id="summary"></div>
     <div class="bars" id="bars"></div>
   </div>
 
-  <!-- Upcoming Events (Sample) -->
   <div class="card events">
     <h2>Upcoming Events</h2>
     <div class="subtitle" id="eventSummary"></div>
@@ -105,7 +96,6 @@ h1,h2{margin:0 0 10px}
   </div>
 </div>
 
-<!-- Bottom nav (square icons) -->
 <div class="footer">
   <div class="chips">
     <div class="chip active-chip" title="Home"><i class="lucide lucide-home"></i></div>
@@ -117,154 +107,110 @@ h1,h2{margin:0 0 10px}
 </div>
 
 <script>
-/* Distinct datasets so the UI visibly changes between Day/Week/Month */
 const DATA = {
   day: {
-    note: "(Day view)",
-    context: {
-      main: "You're on track today with one moderate dining expense.",
-      why:  "One dining event and one work expense are planned; both are within daily targets."
-    },
-    categories: [
-      {cat:"Dining",         spent:10, budget:15},  // 67%
-      {cat:"Work Expenses",  spent: 4, budget:20},  // 20%
-      {cat:"Transportation", spent: 8, budget:12},  // 67%
-      {cat:"Entertainment",  spent: 2, budget:10},  // 20%
-      {cat:"Subscriptions",  spent: 5, budget: 5}   // 100%
+    note:"(Day view)",
+    context:{main:"You're on track today with one moderate dining expense.",
+      why:"One dining event and one work expense are planned; both within daily targets."},
+    categories:[
+      {cat:"Dining",spent:10,budget:15},
+      {cat:"Work",spent:4,budget:20},
+      {cat:"Transport",spent:8,budget:12},
+      {cat:"Entertainment",spent:2,budget:10}
     ],
-    events: [
-      {title:"Coffee meeting", category:"Work Expenses", cost:6},
-      {title:"Lunch out",      category:"Dining",        cost:10},
-      {title:"Gym class",      category:"Subscriptions", cost:5}
+    events:[
+      {title:"Lunch out",category:"Dining",cost:10},
+      {title:"Client call",category:"Work",cost:0},
+      {title:"Gym class",category:"Fitness",cost:5}
     ]
   },
-  week: {
-    note: "(Week view)",
-    context: {
-      main: "Dining is close to budget. Plan one meal at home to stay on track.",
-      why:  "Three dining events (~$95) and two entertainment items (~$31) cluster midweek, raising risk of overspend."
-    },
-    categories: [
-      {cat:"Dining",         spent:70, budget:90},  // 78%
-      {cat:"Work Expenses",  spent:40, budget:60},  // 67%
-      {cat:"Transportation", spent:30, budget:45},  // 67%
-      {cat:"Entertainment",  spent:20, budget:50},  // 40%
-      {cat:"Subscriptions",  spent:15, budget:15}   // 100%
+  week:{
+    note:"(Week view)",
+    context:{main:"Dining is close to budget. Plan one meal at home to stay on track.",
+      why:"Three dining events (~$95) and two entertainment items (~$31) cluster midweek."},
+    categories:[
+      {cat:"Dining",spent:70,budget:90},
+      {cat:"Work",spent:40,budget:60},
+      {cat:"Transport",spent:30,budget:45},
+      {cat:"Entertainment",spent:20,budget:50}
     ],
-    events: [
-      {title:"Dinner w/ friends", category:"Dining",        cost:45},
-      {title:"Movie night",       category:"Entertainment", cost:16},
-      {title:"Transit top-up",    category:"Transportation",cost:12}
+    events:[
+      {title:"Dinner w/ friends",category:"Dining",cost:45},
+      {title:"Movie night",category:"Entertainment",cost:16},
+      {title:"Transit top-up",category:"Transport",cost:12}
     ]
   },
-  month: {
-    note: "(Month view)",
-    context: {
-      main: "Dining is at 85% of its limit. Consider skipping one meal out next week.",
-      why:  "Three dining events (~$230) fall in the same pay period as subscriptions and entertainment charges."
-    },
-    categories: [
-      {cat:"Dining",         spent:128, budget:150}, // 85%
-      {cat:"Work Expenses",  spent: 45, budget:120}, // 38%
-      {cat:"Transportation", spent: 70, budget: 80}, // 88%
-      {cat:"Entertainment",  spent: 95, budget:100}, // 95%
-      {cat:"Subscriptions",  spent: 30, budget: 60}  // 50%
+  month:{
+    note:"(Month view)",
+    context:{main:"Dining is at 85% of its limit. Consider skipping one meal out next week.",
+      why:"Three dining events (~$230) fall in the same pay period as subscriptions and entertainment charges."},
+    categories:[
+      {cat:"Dining",spent:128,budget:150},
+      {cat:"Work",spent:45,budget:120},
+      {cat:"Transport",spent:70,budget:80},
+      {cat:"Entertainment",spent:95,budget:100}
     ],
-    events: [
-      {title:"Client lunch",  category:"Work Expenses", cost:30},
-      {title:"Concert",       category:"Entertainment", cost:80},
-      {title:"Dining out",    category:"Dining",        cost:70}
+    events:[
+      {title:"Client lunch",category:"Work",cost:30},
+      {title:"Concert",category:"Entertainment",cost:80},
+      {title:"Dinner out",category:"Dining",cost:70}
     ]
   }
 };
 
-function colorFor(p){ return p<70?'var(--ok)':(p<100?'var(--warn)':'var(--bad)'); }
+function colorFor(p){return p<70?'var(--ok)':(p<100?'var(--warn)':'var(--bad)');}
 
-function renderBars(categories){
-  const bars = document.getElementById('bars');
-  bars.innerHTML = '';
-  categories.forEach(c=>{
-    const pct = Math.round((c.spent / Math.max(1,c.budget)) * 100);
-
-    const row = document.createElement('div'); row.className='row';
-    const label = document.createElement('div'); label.className='label'; label.textContent = c.cat;
-
-    const bar = document.createElement('div'); bar.className='bar';
-    const fill = document.createElement('div'); fill.className='fill';
-    fill.style.width = Math.min(100,pct)+'%';
-    fill.style.background = colorFor(pct);
-
-    const pctText = document.createElement('div'); pctText.className='pct'; pctText.textContent = pct+'%';
-
-    const hint = document.createElement('div'); hint.className='hint';
-    hint.textContent = `${c.cat}: $${c.spent} of $${c.budget} • Tip: shift one event to save ~$${10 + Math.floor(Math.random()*25)}`;
-
-    bar.appendChild(fill); bar.appendChild(pctText); bar.appendChild(hint);
-    row.appendChild(label); row.appendChild(bar);
-    bars.appendChild(row);
+function renderBars(cats){
+  const bars=document.getElementById('bars');bars.innerHTML='';
+  let totalSpent=0,totalBudget=0;
+  cats.forEach(c=>{
+    const pct=Math.round((c.spent/Math.max(1,c.budget))*100);
+    const row=document.createElement('div');row.className='row';
+    const label=document.createElement('div');label.className='label';label.textContent=c.cat;
+    const bar=document.createElement('div');bar.className='bar';
+    const fill=document.createElement('div');fill.className='fill';
+    fill.style.width=Math.min(100,pct)+'%';fill.style.background=colorFor(pct);
+    const pctText=document.createElement('div');pctText.className='pct';pctText.textContent=pct+'%';
+    const hint=document.createElement('div');hint.className='hint';
+    hint.textContent=`${c.cat}: $${c.spent} of $${c.budget}`;
+    bar.appendChild(fill);bar.appendChild(pctText);bar.appendChild(hint);
+    row.appendChild(label);row.appendChild(bar);bars.appendChild(row);
+    totalSpent+=c.spent;totalBudget+=c.budget;
   });
-}
-
-function renderSummary(categories){
-  const totalBudget = categories.reduce((a,b)=>a+b.budget,0);
-  const totalSpent  = categories.reduce((a,b)=>a+b.spent,0);
-  const pct = Math.round(totalSpent / Math.max(1,totalBudget) * 100);
-  document.getElementById('summary').textContent = `Total spent: $${totalSpent} of $${totalBudget} (${pct}%)`;
+  document.getElementById('summary').textContent=`Total spent: $${totalSpent} of $${totalBudget} (${Math.round(totalSpent/totalBudget*100)}%)`;
 }
 
 function renderEvents(events){
-  const list = document.getElementById('events');
-  list.innerHTML = '';
-  let total = 0;
-  events.forEach(e=>{
-    total += e.cost;
-    const item = document.createElement('div'); item.className='item';
-    const left = document.createElement('div'); left.className='title';
-    left.textContent = e.title + ' ';
-    const cat = document.createElement('span'); cat.className='pill'; cat.textContent = e.category;
-    left.appendChild(cat);
-    const right = document.createElement('div'); right.className='amt'; right.textContent = '$' + e.cost;
-    item.appendChild(left); item.appendChild(right);
-    list.appendChild(item);
+  const list=document.getElementById('events');list.innerHTML='';
+  let total=0;events.forEach(e=>{
+    const item=document.createElement('div');item.className='item';
+    const left=document.createElement('div');left.className='title';left.textContent=e.title+' ';
+    const cat=document.createElement('span');cat.className='pill';cat.textContent=e.category;left.appendChild(cat);
+    const right=document.createElement('div');right.className='amt';right.textContent='$'+e.cost;
+    item.appendChild(left);item.appendChild(right);list.appendChild(item);total+=e.cost;
   });
-  document.getElementById('eventSummary').textContent = `${events.length} sample events • total ${'$'+total}`;
+  document.getElementById('eventSummary').textContent=`${events.length} sample events • total $${total}`;
 }
 
-function renderContext(note, ctx){
-  document.getElementById('viewNote').textContent = note;
-  document.getElementById('contextMain').textContent = ctx.main;
-  const why = document.getElementById('contextWhy');
-  why.textContent = ctx.why;
-  if (why.style.display === 'block') {
-    // keep it open but ensure it matches the new view’s text
-    why.textContent = ctx.why;
-  }
+function renderContext(d){
+  document.getElementById('viewNote').textContent=d.note;
+  document.getElementById('contextMain').textContent=d.context.main;
+  document.getElementById('contextWhy').textContent=d.context.why;
 }
 
 function setView(view){
   document.querySelectorAll('.segmented button').forEach(b=>b.classList.remove('active'));
   document.getElementById('btn-'+view).classList.add('active');
-
-  const d = DATA[view];
-  renderContext(d.note, d.context);
+  const d=DATA[view];
   renderBars(d.categories);
-  renderSummary(d.categories);
   renderEvents(d.events);
+  renderContext(d);
 }
 
-/* Why? link toggles explanation */
-document.addEventListener('DOMContentLoaded', ()=>{
-  document.getElementById('whyLink').addEventListener('click', (e)=>{
-    e.preventDefault();
-    const w = document.getElementById('contextWhy');
-    w.style.display = (w.style.display==='block' ? 'none' : 'block');
-  });
-
-  document.getElementById('btn-day').addEventListener('click',  ()=>setView('day'));
-  document.getElementById('btn-week').addEventListener('click', ()=>setView('week'));
-  document.getElementById('btn-month').addEventListener('click',()=>setView('month'));
-
-  setView('month'); // default
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('whyLink').onclick=()=>{const w=document.getElementById('contextWhy');w.style.display=w.style.display==='block'?'none':'block';};
+  ['day','week','month'].forEach(v=>document.getElementById('btn-'+v).onclick=()=>setView(v));
+  setView('month');
 });
 </script>
 </body>
